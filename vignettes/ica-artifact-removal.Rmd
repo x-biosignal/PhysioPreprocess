@@ -1,0 +1,283 @@
+---
+title: "ICA-Based Artifact Removal"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ICA-Based Artifact Removal}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+## Introduction
+
+Independent Component Analysis (ICA) is a blind source separation technique
+commonly used to identify and remove artifacts from electrophysiological
+recordings. Artifacts such as eye blinks, eye movements, muscle activity, and
+heartbeat contamination can be isolated as independent components and removed
+without discarding entire channels or epochs.
+
+PhysioPreprocess provides two ICA workflows:
+
+1. **Built-in ICA** (`icaDecompose()` / `icaRemove()`): A self-contained
+   FastICA implementation with no additional dependencies.
+2. **fastICA-based** (`runICA()` / `removeICAComponents()`): A wrapper around
+   the `fastICA` package for users who prefer that interface.
+
+This vignette walks through both approaches.
+
+## Setup
+
+```{r load-packages}
+library(PhysioCore)
+library(PhysioPreprocess)
+```
+
+## Creating Example Data
+
+We simulate a multi-channel EEG recording containing a mixture of neural
+sources and artifact sources.
+
+```{r create-data}
+set.seed(123)
+n_time <- 2560
+n_channels <- 16
+sr <- 256
+
+# Simulate 10 seconds of data with injected artifacts
+raw_data <- matrix(rnorm(n_time * n_channels), nrow = n_time, ncol = n_channels)
+
+# Inject a simulated eye-blink artifact into frontal channels
+blink <- dnorm(seq(-3, 3, length.out = 100), mean = 0, sd = 1) * 50
+blink_onset <- 500
+raw_data[blink_onset:(blink_onset + 99), 1:2] <-
+  raw_data[blink_onset:(blink_onset + 99), 1:2] + blink
+
+pe <- PhysioExperiment(
+  assays = list(raw = raw_data),
+  colData = S4Vectors::DataFrame(
+    label = paste0("Ch", seq_len(n_channels)),
+    type = rep("EEG", n_channels)
+  ),
+  samplingRate = sr
+)
+pe
+```
+
+## Workflow 1: Built-In ICA
+
+The built-in ICA implementation uses the FastICA algorithm with PCA-based
+whitening. It requires no additional packages.
+
+### Step 1: Decompose into Independent Components
+
+`icaDecompose()` separates the multi-channel signal into statistically
+independent components. Each component represents a source signal that is
+maximally non-Gaussian.
+
+```{r ica-decompose}
+ica_result <- icaDecompose(pe, n_components = 16, method = "fastica")
+```
+
+The result is a list containing:
+
+- `components`: The independent component time courses (time x components).
+- `mixing`: The mixing matrix mapping components to channels.
+- `unmixing`: The unmixing matrix mapping channels to components.
+- `object`: The updated `PhysioExperiment` with ICA components stored in the
+  `"ica_components"` assay.
+
+```{r inspect-result}
+str(ica_result$mixing)
+str(ica_result$unmixing)
+
+# The PhysioExperiment now contains the ICA components as an assay
+pe_ica <- ica_result$object
+SummarizedExperiment::assayNames(pe_ica)
+```
+
+### Step 2: Identify Artifact Components
+
+Identifying which components represent artifacts is typically done through
+visual inspection of component time courses and topographies. Components
+corresponding to eye blinks tend to show large, brief deflections concentrated
+over frontal electrodes.
+
+```{r identify-artifacts}
+# Examine the mixing matrix to see each component's spatial pattern
+# Columns of the mixing matrix show the contribution of each component
+# to each channel
+mixing <- ica_result$mixing
+print(round(mixing[, 1:4], 3))
+
+# A component heavily weighted on frontal channels (Ch1, Ch2) with
+# characteristic blink morphology is likely an eye-blink artifact
+```
+
+### Step 3: Remove Artifact Components
+
+Once artifact components have been identified, `icaRemove()` zeros out those
+components and reconstructs the signal from the remaining components.
+
+```{r ica-remove}
+# Remove component 1 (identified as eye-blink artifact)
+pe_clean <- icaRemove(pe_ica, components = c(1), output_assay = "ica_cleaned")
+
+# The cleaned data is stored in the "ica_cleaned" assay
+SummarizedExperiment::assayNames(pe_clean)
+```
+
+## Workflow 2: fastICA Package
+
+If the `fastICA` package is installed, you can use the `runICA()` and
+`removeICAComponents()` wrapper functions. These provide a simpler interface
+that delegates computation to the `fastICA` package.
+
+### Step 1: Run ICA
+
+```{r run-ica}
+ica_result2 <- runICA(pe, n_components = 10)
+```
+
+The result is a list with:
+
+- `S`: Source matrix (time x components).
+- `A`: Mixing matrix (channels x components).
+- `W`: Unmixing matrix (components x channels).
+
+```{r inspect-ica}
+dim(ica_result2$S)
+dim(ica_result2$A)
+dim(ica_result2$W)
+```
+
+### Step 2: Remove Components
+
+After identifying artifact components, use `removeICAComponents()` to
+reconstruct the cleaned signal.
+
+```{r remove-components}
+pe_clean2 <- removeICAComponents(pe, ica_result2, remove_components = c(1, 3))
+SummarizedExperiment::assayNames(pe_clean2)
+```
+
+## Detecting Bad Channels
+
+Before running ICA, it is often helpful to identify and handle bad channels.
+Bad channels can degrade ICA decomposition quality because they introduce noise
+that may spread across multiple components.
+
+```{r detect-bad}
+# Detect channels with abnormally high or low variance
+bad_zscore <- detectBadChannels(pe, method = "zscore", threshold = 3)
+
+# Detect channels with low correlation to neighbors
+bad_corr <- detectBadChannels(pe, method = "correlation", threshold = 0.4)
+
+# Detect flatline channels
+bad_flat <- detectBadChannels(pe, method = "flatline", threshold = 0.01)
+
+# Combine results
+bad_all <- unique(c(bad_zscore, bad_corr, bad_flat))
+print(bad_all)
+```
+
+### Interpolating Bad Channels
+
+Bad channels can be replaced with interpolated values from neighboring
+channels before ICA decomposition.
+
+```{r interpolate-bad}
+if (length(bad_all) > 0) {
+  pe_interp <- interpolateBadChannels(pe, bad_channels = bad_all,
+                                       method = "average")
+}
+```
+
+## Recommended Preprocessing Order
+
+A typical preprocessing pipeline for EEG data incorporating ICA artifact
+removal follows this order:
+
+1. **Highpass filter** to remove slow drifts (e.g., 1 Hz cutoff).
+2. **Notch filter** to remove power line noise.
+3. **Detect and interpolate bad channels**.
+4. **Run ICA** on the cleaned, filtered data.
+5. **Identify and remove artifact components**.
+6. **Re-reference** to average reference.
+7. **Epoch** the data around events of interest.
+8. **Baseline correct** each epoch.
+
+```{r full-pipeline}
+# Step 1: Highpass filter at 1 Hz
+pe_hp <- butterworthFilter(pe, low = 1, type = "high")
+
+# Step 2: Notch filter at 50 Hz
+pe_notch <- notchFilter(pe_hp, freq = 50)
+
+# Step 3: Detect and interpolate bad channels
+bad <- detectBadChannels(pe_notch, method = "zscore")
+if (length(bad) > 0) {
+  pe_notch <- interpolateBadChannels(pe_notch, bad_channels = bad)
+}
+
+# Step 4: Run ICA
+ica <- icaDecompose(pe_notch, method = "fastica")
+pe_ica <- ica$object
+
+# Step 5: Remove artifact components (after visual inspection)
+pe_clean <- icaRemove(pe_ica, components = c(1))
+
+# Step 6: Re-reference to average
+pe_ref <- rereference(pe_clean, ref_type = "average")
+```
+
+## Choosing the Number of Components
+
+The number of ICA components to extract affects decomposition quality:
+
+- **Too few components**: Artifact and neural sources may be mixed within the
+  same component, making clean separation impossible.
+- **Too many components**: Components may capture noise rather than meaningful
+  sources, and the decomposition may become unstable.
+
+A common practice is to use the same number of components as channels, or to
+reduce dimensionality first via PCA (which `icaDecompose()` does internally
+during the whitening step).
+
+```{r n-components}
+# Use all channels
+ica_full <- icaDecompose(pe, n_components = n_channels)
+
+# Use a reduced number (e.g., for rank-deficient data after average reference)
+ica_reduced <- icaDecompose(pe, n_components = 12)
+```
+
+## Summary
+
+This vignette demonstrated two ICA workflows available in PhysioPreprocess:
+
+- **Built-in ICA** via `icaDecompose()` and `icaRemove()`, requiring no
+  additional packages.
+- **fastICA-based** via `runICA()` and `removeICAComponents()`, wrapping the
+  `fastICA` package.
+
+Both workflows follow the same general pattern: decompose the signal,
+identify artifact components, and reconstruct the cleaned signal with those
+components removed.
+
+For general preprocessing operations (filtering, resampling, re-referencing,
+detrending), see `vignette("preprocessing-guide", package = "PhysioPreprocess")`.
+
+## References
+
+- Hyvarinen A, Oja E (2000). "Independent component analysis: algorithms and
+  applications." *Neural Networks*, 13(4-5), 411-430.
+- Makeig S, Bell AJ, Jung TP, Sejnowski TJ (1996). "Independent component
+  analysis of electroencephalographic data." *Advances in Neural Information
+  Processing Systems*, 8, 145-151.
+- Delorme A, Makeig S (2004). "EEGLAB: an open source toolbox for analysis of
+  single-trial EEG dynamics including independent component analysis."
+  *Journal of Neuroscience Methods*, 134(1), 9-21.

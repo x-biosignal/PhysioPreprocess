@@ -1,0 +1,50 @@
+# Re-export PhysioCore
+import(PhysioCore)
+
+# Filters
+export(filterSignals)
+export(butterworthFilter)
+export(firFilter)
+export(notchFilter)
+export(detrendSignal)
+
+# Resampling
+export(resample)
+export(decimate)
+export(interpolate)
+export(assaySamplingRates)
+export(setAssaySamplingRate)
+
+# Artifact detection and removal
+export(icaDecompose)
+export(icaRemove)
+export(detectBadChannels)
+export(interpolateBadChannels)
+export(rejectBadEpochs)
+export(baselineCorrect)
+
+# ICA (new implementation)
+export(runICA)
+export(removeICAComponents)
+
+# Detrending
+export(detrendSignals)
+export(removeBaseline)
+
+# Re-referencing
+export(rereference)
+export(getCurrentReference)
+export(isAverageReferenced)
+
+# Preprocessing pipeline
+export(createPipeline)
+export(applyPipeline)
+S3method(print, PhysioPipeline)
+
+# Imports
+import(methods)
+importFrom(S4Vectors, DataFrame, SimpleList, metadata, "metadata<-")
+importFrom(SummarizedExperiment, SummarizedExperiment, assay, "assay<-",
+           assayNames, assays, "assays<-", rowData, "rowData<-", colData)
+importFrom(signal, butter, filter, filtfilt, freqz)
+importFrom(stats, approx, fft, mvfft, convolve, lm, residuals, predict, median, mad, sd, poly, cor, rnorm, var)
