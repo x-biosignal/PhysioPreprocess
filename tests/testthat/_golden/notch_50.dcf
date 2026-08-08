@@ -1,0 +1,7 @@
+Key: notch_50
+Source: signal::filtfilt(signal::butter(4, c(49,51)/125, 'stop'), x)
+        per column; independent DSP reference for notchFilter(freq=50,
+        bandwidth=2)
+Tolerance: 1e-08
+Captured: 2026-07-10 23:55:47 UTC
+R: 4.5.2

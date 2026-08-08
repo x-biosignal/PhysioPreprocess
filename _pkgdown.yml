@@ -1,0 +1,102 @@
+url: https://x-biosignal.github.io/PhysioPreprocess/
+template:
+  bootstrap: 5
+  bslib:
+    primary: "#2c3e50"
+navbar:
+  structure:
+    left: [reference, articles]
+    right: [ecosystem, search, github]
+  components:
+    ecosystem:
+      text: Ecosystem
+      menu:
+        - text: PhysioCore
+          href: https://x-biosignal.github.io/PhysioCore/
+        - text: PhysioIO
+          href: https://x-biosignal.github.io/PhysioIO/
+        - text: PhysioPreprocess
+          href: https://x-biosignal.github.io/PhysioPreprocess/
+        - text: PhysioAnalysis
+          href: https://x-biosignal.github.io/PhysioAnalysis/
+        - text: PhysioEEG
+          href: https://x-biosignal.github.io/PhysioEEG/
+        - text: PhysioECG
+          href: https://x-biosignal.github.io/PhysioECG/
+        - text: PhysioEMG
+          href: https://x-biosignal.github.io/PhysioEMG/
+        - text: PhysioEDA
+          href: https://x-biosignal.github.io/PhysioEDA/
+        - text: PhysioMoCap
+          href: https://x-biosignal.github.io/PhysioMoCap/
+        - text: PhysioCrossModal
+          href: https://x-biosignal.github.io/PhysioCrossModal/
+        - text: PhysioMSKNet
+          href: https://x-biosignal.github.io/PhysioMSKNet/
+        - text: PhysioOpenSim
+          href: https://x-biosignal.github.io/PhysioOpenSim/
+        - text: PhysioAnnotationHub
+          href: https://x-biosignal.github.io/PhysioAnnotationHub/
+        - text: PhysioClinical
+          href: https://x-biosignal.github.io/PhysioClinical/
+        - text: PhysioClinStats
+          href: https://x-biosignal.github.io/PhysioClinStats/
+        - text: PhysioReport
+          href: https://x-biosignal.github.io/PhysioReport/
+    github:
+      icon: fa-github
+      href: https://github.com/x-biosignal/PhysioPreprocess
+reference:
+  - title: Filtering
+    desc: Frequency-domain and time-domain filtering of signals.
+    contents:
+    - filterSignals
+    - butterworthFilter
+    - firFilter
+    - notchFilter
+    - detrendSignal
+    - detrendSignals
+  - title: Resampling
+    desc: Changing sampling rate and interpolating signals.
+    contents:
+    - resample
+    - decimate
+    - interpolate
+    - assaySamplingRates
+    - setAssaySamplingRate
+  - title: Artifact detection & removal
+    desc: Detecting and removing artifacts, bad channels, and bad epochs.
+    contents:
+    - detectArtifacts
+    - detectBadChannels
+    - interpolateBadChannels
+    - rejectBadEpochs
+    - cleanData
+  - title: Independent Component Analysis
+    desc: ICA decomposition and component-based artifact removal.
+    contents:
+    - runICA
+    - removeICAComponents
+    - icaDecompose
+    - icaRemove
+    - classifyICAComponents
+  - title: Baseline & re-referencing
+    desc: Baseline correction and re-referencing operations.
+    contents:
+    - baselineCorrect
+    - removeBaseline
+    - rereference
+    - getCurrentReference
+    - isAverageReferenced
+  - title: Preprocessing pipelines
+    desc: Building and applying reusable preprocessing pipelines.
+    contents:
+    - createPipeline
+    - applyPipeline
+    - print.PhysioPipeline
+articles:
+  - title: Articles
+    navbar: ~
+    contents:
+    - ica-artifact-removal
+    - preprocessing-guide

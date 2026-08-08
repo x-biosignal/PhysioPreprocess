@@ -1,0 +1,7 @@
+Key: butter_bandpass_ba
+Source: signal::filtfilt(signal::butter(4, c(1,40)/125, 'pass'), x)
+        applied per column; independent DSP reference for
+        butterworthFilter(use_sos=FALSE)
+Tolerance: 1e-08
+Captured: 2026-07-10 23:55:47 UTC
+R: 4.5.2

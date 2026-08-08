@@ -1,0 +1,52 @@
+Package: PhysioPreprocess
+Title: Preprocessing Functions for PhysioExperiment Objects
+Version: 0.3.1
+Authors@R:
+    person(given = "Yusuke",
+           family = "Matsui",
+           role = c("aut", "cre"),
+           email = "mail.to.matsui@gmail.com")
+Description: Provides preprocessing functions for physiological signal data
+    stored in 'SummarizedExperiment'-derived objects, including digital filters
+    ('Butterworth' and notch), resampling, re-referencing, artifact detection,
+    independent component analysis ('ICA') based artifact removal, and
+    composable preprocessing pipelines.
+Depends:
+    R (>= 4.2),
+    PhysioCore
+Imports:
+    methods,
+    Rcpp,
+    SummarizedExperiment,
+    S4Vectors,
+    signal,
+    stats
+Suggests:
+    fastICA,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.2.0)
+LinkingTo:
+    Rcpp
+VignetteBuilder: knitr
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Collate:
+    'RcppExports.R'
+    'utils-provenance.R'
+    'filters.R'
+    'filters-advanced.R'
+    'filters-causal.R'
+    'resample.R'
+    'rereference.R'
+    'artifact.R'
+    'asr.R'
+    'lineNoise.R'
+    'ica.R'
+    'detrending.R'
+    'preprocessing-pipeline.R'
+    'zzz.R'
+RoxygenNote: 7.3.3
+URL: https://github.com/x-biosignal/PhysioPreprocess, https://x-biosignal.r-universe.dev/PhysioPreprocess
+BugReports: https://github.com/x-biosignal/PhysioPreprocess/issues
