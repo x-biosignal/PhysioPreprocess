@@ -2,10 +2,10 @@
 
 **Deprecated**: these accessors now live in PhysioCore. The version here
 delegates to
-[`PhysioCore::assaySamplingRates()`](https://x-biosignal.r-universe.dev/PhysioCore/reference/assaySamplingRates.html)
+[`PhysioCore::assaySamplingRates()`](https://x-biosignal.github.io/PhysioCore//reference/assaySamplingRates.html)
 for backward compatibility; new code should call the PhysioCore function
 directly, or use the canonical multi-rate container
-[`PhysioCore::MultiRatePhysioExperiment()`](https://x-biosignal.r-universe.dev/PhysioCore/reference/MultiRatePhysioExperiment.html)
+[`PhysioCore::MultiRatePhysioExperiment()`](https://x-biosignal.github.io/PhysioCore//reference/MultiRatePhysioExperiment.html)
 when streams differ in length.
 
 ## Usage
@@ -26,5 +26,5 @@ A named numeric vector of per-assay sampling rates (Hz).
 
 ## See also
 
-[`assaySamplingRates`](https://x-biosignal.r-universe.dev/PhysioCore/reference/assaySamplingRates.html),
-[`MultiRatePhysioExperiment`](https://x-biosignal.r-universe.dev/PhysioCore/reference/MultiRatePhysioExperiment.html)
+[`assaySamplingRates`](https://x-biosignal.github.io/PhysioCore//reference/assaySamplingRates.html),
+[`MultiRatePhysioExperiment`](https://x-biosignal.github.io/PhysioCore//reference/MultiRatePhysioExperiment.html)

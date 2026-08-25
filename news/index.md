@@ -40,8 +40,7 @@
   [`rereference()`](https://x-biosignal.github.io/PhysioPreprocess/reference/rereference.md)
   provenance was standardized from the ad-hoc `withProvenance` call to
   the shared `.recordProv` helper (still one `rereference` activity;
-  excluded channels remain in metadata). Closes the resample/rereference
-  part of the AGENT-02 tool-provenance gap. No numeric change.
+  excluded channels remain in metadata). No numeric change.
 
 ## PhysioPreprocess 0.3.2
 
@@ -69,7 +68,7 @@
   append an activity entry (with their parameters, input/output assays,
   and package version) via `.recordProv()`, so a filtering step is now
   visible in
-  [`provenance()`](https://x-biosignal.r-universe.dev/PhysioCore/reference/provenance.html)
+  [`provenance()`](https://x-biosignal.github.io/PhysioCore//reference/provenance.html)
   and in run-DAG capture. Previously these operations were silent,
   leaving a gap in the provenance record. No filtering behaviour
   changes.
