@@ -68,7 +68,7 @@
   append an activity entry (with their parameters, input/output assays,
   and package version) via `.recordProv()`, so a filtering step is now
   visible in
-  [`provenance()`](https://x-biosignal.github.io/PhysioCore//reference/provenance.html)
+  [`provenance()`](https://x-biosignal.r-universe.dev/PhysioExperiment/reference/provenance.html)
   and in run-DAG capture. Previously these operations were silent,
   leaving a gap in the provenance record. No filtering behaviour
   changes.
