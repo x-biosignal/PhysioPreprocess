@@ -1,0 +1,12 @@
+citHeader("To cite PhysioPreprocess in publications use:")
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "PhysioPreprocess: Preprocessing Functions for PhysioExperiment Objects",
+  author   = person("Yusuke", "Matsui"),
+  year     = "2026",
+  note     = paste("R package version", meta$Version),
+  url      = "https://github.com/x-biosignal/PhysioPreprocess"
+  # doi    = "10.5281/zenodo.XXXXXXX"  # add once minted
+)
+
