@@ -63,3 +63,15 @@ for integer-factor downsampling with anti-aliasing,
 for integer-factor upsampling,
 [`setAssaySamplingRate()`](https://x-biosignal.github.io/PhysioPreprocess/reference/setAssaySamplingRate.md)
 for per-assay rate tracking.
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(500 * 2), nrow = 500, ncol = 2)),
+  samplingRate = 100
+)
+pe_50 <- resample(pe, target_rate = 50)
+samplingRate(pe_50)
+#> [1] 50
+```

@@ -65,3 +65,13 @@ remove power line artifacts." *NeuroImage*, 207, 116356.
 [`cleanLine`](https://x-biosignal.github.io/PhysioPreprocess/reference/cleanLine.md),
 [`notchFilter`](https://x-biosignal.github.io/PhysioPreprocess/reference/notchFilter.md)
 (the fast fixed notch)
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(400 * 3), nrow = 400, ncol = 3)),
+  samplingRate = 200
+)
+pe <- zapLine(pe, line_freq = 50)
+```

@@ -36,3 +36,16 @@ detectArtifacts(
 
 A data.frame with columns: onset (seconds), offset (seconds), channel
 (index), type (detection method).
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(500 * 2), nrow = 500, ncol = 2)),
+  samplingRate = 100
+)
+arts <- detectArtifacts(pe, method = "amplitude")
+head(arts)
+#>   onset offset channel      type
+#> 1  3.36   3.37       1 amplitude
+```

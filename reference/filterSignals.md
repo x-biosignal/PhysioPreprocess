@@ -49,3 +49,13 @@ for FIR filtering,
 for power line noise removal,
 [`detrendSignal()`](https://x-biosignal.github.io/PhysioPreprocess/reference/detrendSignal.md)
 for trend removal.
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(300 * 3), nrow = 300, ncol = 3)),
+  samplingRate = 100
+)
+pe <- filterSignals(pe, window = 5)
+```

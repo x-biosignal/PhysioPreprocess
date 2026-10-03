@@ -27,7 +27,7 @@ Or install the development version from GitHub:
 
 ``` r
 
-# install.packages("remotes")
+# install.packages("remotes", repos = "https://cloud.r-project.org")
 remotes::install_github("x-biosignal/PhysioPreprocess")
 ```
 
@@ -39,7 +39,6 @@ library(PhysioPreprocess)
 
 # Create sample EEG data (4 seconds, 4 channels, 250 Hz)
 signal_matrix <- matrix(rnorm(1000 * 4), nrow = 1000, ncol = 4)
-colnames(signal_matrix) <- c("Fz", "Cz", "Pz", "Oz")
 
 pe <- PhysioExperiment(
   assays = list(raw = signal_matrix),
@@ -47,17 +46,13 @@ pe <- PhysioExperiment(
 )
 
 # Apply a 1-40 Hz bandpass Butterworth filter
-pe <- filterSignals(pe, lowcut = 1, highcut = 40, order = 4)
+pe <- butterworthFilter(pe, low = 1, high = 40, order = 4)
 
 # Remove 50 Hz line noise with a notch filter
 pe <- notchFilter(pe, freq = 50)
 
-# ICA-based artifact removal
-ica_result <- runICA(pe, n_components = 4)
-pe <- removeICAComponents(pe, ica_result, components = c(1))
-
-# Re-reference to average
-pe <- rereference(pe, ref = "average")
+# Re-reference to the average of all channels
+pe <- rereference(pe, ref_type = "average")
 
 # Check reference status
 isAverageReferenced(pe)  # TRUE
@@ -70,15 +65,18 @@ isAverageReferenced(pe)  # TRUE
 A full suite of frequency-domain filters for physiological signals:
 
 - **Butterworth:**
-  [`filterSignals()`](https://x-biosignal.github.io/PhysioPreprocess/reference/filterSignals.md),
   [`butterworthFilter()`](https://x-biosignal.github.io/PhysioPreprocess/reference/butterworthFilter.md)
-  – bandpass, lowpass, and highpass IIR filters with configurable order
+  – bandpass, lowpass, highpass, and band-stop IIR filters with
+  configurable order
 - **FIR:**
   [`firFilter()`](https://x-biosignal.github.io/PhysioPreprocess/reference/firFilter.md)
   – finite impulse response filters for linear-phase filtering
 - **Notch:**
   [`notchFilter()`](https://x-biosignal.github.io/PhysioPreprocess/reference/notchFilter.md)
   – remove power line interference (50/60 Hz) and harmonics
+- **Smoothing:**
+  [`filterSignals()`](https://x-biosignal.github.io/PhysioPreprocess/reference/filterSignals.md)
+  – moving-average smoother over a configurable sample window
 - **Detrending:**
   [`detrendSignal()`](https://x-biosignal.github.io/PhysioPreprocess/reference/detrendSignal.md),
   [`detrendSignals()`](https://x-biosignal.github.io/PhysioPreprocess/reference/detrendSignals.md)
@@ -154,9 +152,9 @@ Build reproducible, shareable preprocessing chains:
 
 # Build a reusable preprocessing pipeline
 pipeline <- createPipeline(
-  list(filterSignals, lowcut = 1, highcut = 40),
-  list(notchFilter, freq = 50),
-  list(rereference, ref = "average")
+  list(fn = butterworthFilter, low = 1, high = 40),
+  list(fn = notchFilter, freq = 50),
+  list(fn = rereference, ref_type = "average")
 )
 
 # Apply to any PhysioExperiment

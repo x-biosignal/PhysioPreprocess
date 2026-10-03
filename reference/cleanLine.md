@@ -75,3 +75,13 @@ University Press.
 [`zapLine`](https://x-biosignal.github.io/PhysioPreprocess/reference/zapLine.md),
 [`notchFilter`](https://x-biosignal.github.io/PhysioPreprocess/reference/notchFilter.md)
 (the fast fixed notch)
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(400 * 3), nrow = 400, ncol = 3)),
+  samplingRate = 200
+)
+pe <- cleanLine(pe, line_freq = 50, window_sec = 1)
+```

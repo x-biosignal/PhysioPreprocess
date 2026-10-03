@@ -1,8 +1,8 @@
 # Set a per-assay sampling rate (moved to PhysioCore)
 
 **Deprecated**: delegates to
-[`PhysioCore::setAssaySamplingRate()`](https://x-biosignal.r-universe.dev/PhysioExperiment/reference/setAssaySamplingRate.html).
-New code should use PhysioCore directly.
+[`PhysioExperiment::setAssaySamplingRate()`](https://x-biosignal.r-universe.dev/PhysioExperiment/reference/setAssaySamplingRate.html).
+New code should use PhysioExperiment directly.
 
 ## Usage
 
@@ -31,3 +31,16 @@ The updated `PhysioExperiment`.
 ## See also
 
 [`setAssaySamplingRate`](https://x-biosignal.r-universe.dev/PhysioExperiment/reference/setAssaySamplingRate.html)
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(100 * 2), nrow = 100, ncol = 2)),
+  samplingRate = 100
+)
+pe <- setAssaySamplingRate(pe, "raw", 100)
+assaySamplingRates(pe)
+#> raw 
+#> 100 
+```

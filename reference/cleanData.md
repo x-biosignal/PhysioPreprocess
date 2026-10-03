@@ -58,3 +58,14 @@ cleanData(
 ## Value
 
 Modified PhysioExperiment with cleaned data.
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(300 * 3), nrow = 300, ncol = 3)),
+  samplingRate = 100
+)
+# Bad-channel detection/interpolation only (ICA needs the fastICA package)
+pe <- cleanData(pe, steps = "bad_channels")
+```

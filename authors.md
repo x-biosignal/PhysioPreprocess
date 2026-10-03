@@ -10,13 +10,13 @@ Source:
 [`inst/CITATION`](https://github.com/x-biosignal/PhysioPreprocess/blob/main/inst/CITATION)
 
 Matsui Y (2026). *PhysioPreprocess: Preprocessing Functions for
-PhysioExperiment Objects*. R package version 0.4.0,
+PhysioExperiment Objects*. R package version 0.4.1,
 <https://github.com/x-biosignal/PhysioPreprocess>.
 
     @Manual{,
       title = {PhysioPreprocess: Preprocessing Functions for PhysioExperiment Objects},
       author = {Yusuke Matsui},
       year = {2026},
-      note = {R package version 0.4.0},
+      note = {R package version 0.4.1},
       url = {https://github.com/x-biosignal/PhysioPreprocess},
     }

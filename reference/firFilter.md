@@ -81,3 +81,14 @@ for power line noise removal,
 for moving average filtering,
 [`lfilter()`](https://x-biosignal.github.io/PhysioPreprocess/reference/lfilter.md)
 for the underlying causal filtering primitive.
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(600 * 2), nrow = 600, ncol = 2)),
+  samplingRate = 100
+)
+# Linear-phase FIR bandpass (1-20 Hz); modest order keeps the example quick
+pe <- firFilter(pe, low = 1, high = 20, order = 20, type = "pass")
+```

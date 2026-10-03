@@ -39,3 +39,14 @@ Prentice Hall.
 for the alternative detrending implementation with polynomial support,
 [`butterworthFilter()`](https://x-biosignal.github.io/PhysioPreprocess/reference/butterworthFilter.md)
 for highpass filtering as an alternative to detrending.
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(200 * 2) + seq_len(200) / 50,
+                            nrow = 200, ncol = 2)),
+  samplingRate = 100
+)
+pe <- detrendSignal(pe, type = "linear")
+```

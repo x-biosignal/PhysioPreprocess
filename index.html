@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">PhysioPreprocess</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,7 +91,7 @@
 <span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://x-biosignal.r-universe.dev"</span>, <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu">repositories</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Or install the development version from GitHub:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes", repos = "https://cloud.r-project.org")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"x-biosignal/PhysioPreprocess"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -102,7 +102,6 @@
 <span></span>
 <span><span class="co"># Create sample EEG data (4 seconds, 4 channels, 250 Hz)</span></span>
 <span><span class="va">signal_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span> <span class="op">*</span> <span class="fl">4</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">1000</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">signal_matrix</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fz"</span>, <span class="st">"Cz"</span>, <span class="st">"Pz"</span>, <span class="st">"Oz"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://x-biosignal.r-universe.dev/PhysioExperiment/reference/PhysioExperiment.html" class="external-link">PhysioExperiment</a></span><span class="op">(</span></span>
 <span>  assays <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>raw <span class="op">=</span> <span class="va">signal_matrix</span><span class="op">)</span>,</span>
@@ -110,17 +109,13 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Apply a 1-40 Hz bandpass Butterworth filter</span></span>
-<span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/filterSignals.html">filterSignals</a></span><span class="op">(</span><span class="va">pe</span>, lowcut <span class="op">=</span> <span class="fl">1</span>, highcut <span class="op">=</span> <span class="fl">40</span>, order <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/butterworthFilter.html">butterworthFilter</a></span><span class="op">(</span><span class="va">pe</span>, low <span class="op">=</span> <span class="fl">1</span>, high <span class="op">=</span> <span class="fl">40</span>, order <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Remove 50 Hz line noise with a notch filter</span></span>
 <span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/notchFilter.html">notchFilter</a></span><span class="op">(</span><span class="va">pe</span>, freq <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># ICA-based artifact removal</span></span>
-<span><span class="va">ica_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/runICA.html">runICA</a></span><span class="op">(</span><span class="va">pe</span>, n_components <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/removeICAComponents.html">removeICAComponents</a></span><span class="op">(</span><span class="va">pe</span>, <span class="va">ica_result</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Re-reference to average</span></span>
-<span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/rereference.html">rereference</a></span><span class="op">(</span><span class="va">pe</span>, ref <span class="op">=</span> <span class="st">"average"</span><span class="op">)</span></span>
+<span><span class="co"># Re-reference to the average of all channels</span></span>
+<span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/rereference.html">rereference</a></span><span class="op">(</span><span class="va">pe</span>, ref_type <span class="op">=</span> <span class="st">"average"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Check reference status</span></span>
 <span><span class="fu"><a href="reference/isAverageReferenced.html">isAverageReferenced</a></span><span class="op">(</span><span class="va">pe</span><span class="op">)</span>  <span class="co"># TRUE</span></span></code></pre></div>
@@ -134,11 +129,13 @@
 <p>A full suite of frequency-domain filters for physiological signals:</p>
 <ul>
 <li>
-<strong>Butterworth:</strong> <code><a href="reference/filterSignals.html">filterSignals()</a></code>, <code><a href="reference/butterworthFilter.html">butterworthFilter()</a></code> – bandpass, lowpass, and highpass IIR filters with configurable order</li>
+<strong>Butterworth:</strong> <code><a href="reference/butterworthFilter.html">butterworthFilter()</a></code> – bandpass, lowpass, highpass, and band-stop IIR filters with configurable order</li>
 <li>
 <strong>FIR:</strong> <code><a href="reference/firFilter.html">firFilter()</a></code> – finite impulse response filters for linear-phase filtering</li>
 <li>
 <strong>Notch:</strong> <code><a href="reference/notchFilter.html">notchFilter()</a></code> – remove power line interference (50/60 Hz) and harmonics</li>
+<li>
+<strong>Smoothing:</strong> <code><a href="reference/filterSignals.html">filterSignals()</a></code> – moving-average smoother over a configurable sample window</li>
 <li>
 <strong>Detrending:</strong> <code><a href="reference/detrendSignal.html">detrendSignal()</a></code>, <code><a href="reference/detrendSignals.html">detrendSignals()</a></code> – remove linear or polynomial trends from signals</li>
 </ul>
@@ -206,9 +203,9 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Build a reusable preprocessing pipeline</span></span>
 <span><span class="va">pipeline</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/createPipeline.html">createPipeline</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">filterSignals</span>, lowcut <span class="op">=</span> <span class="fl">1</span>, highcut <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">notchFilter</span>, freq <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">rereference</span>, ref <span class="op">=</span> <span class="st">"average"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fn <span class="op">=</span> <span class="va">butterworthFilter</span>, low <span class="op">=</span> <span class="fl">1</span>, high <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fn <span class="op">=</span> <span class="va">notchFilter</span>, freq <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fn <span class="op">=</span> <span class="va">rereference</span>, ref_type <span class="op">=</span> <span class="st">"average"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Apply to any PhysioExperiment</span></span>

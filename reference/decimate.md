@@ -47,3 +47,15 @@ for arbitrary-rate resampling,
 for integer-factor upsampling,
 [`butterworthFilter()`](https://x-biosignal.github.io/PhysioPreprocess/reference/butterworthFilter.md)
 for the anti-aliasing filter used internally.
+
+## Examples
+
+``` r
+pe <- PhysioExperiment(
+  assays = list(raw = matrix(rnorm(400 * 2), nrow = 400, ncol = 2)),
+  samplingRate = 100
+)
+pe_dec <- decimate(pe, factor = 2)
+samplingRate(pe_dec)
+#> [1] 50
+```
